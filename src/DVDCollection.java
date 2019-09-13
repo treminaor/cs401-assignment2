@@ -127,18 +127,24 @@ public class DVDCollection {
 
 	
 	public void loadData(String filename) {
-		//todo convert to file name loading
-		addOrModifyDVD("The Shining", "R", "117");
-		addOrModifyDVD("2001: A Space Odyssey", "G", "149");
-		addOrModifyDVD("A Clockwork Orange", "R", "136");
-		addOrModifyDVD("Full Metal Jacket", "R", "116");
-		addOrModifyDVD("Fake Movie Name", "R", "130"); 
-		addOrModifyDVD("Another Fake Movie", "G", "120"); 
-		addOrModifyDVD("Good Fake Movie", "R", "120");
-		addOrModifyDVD("The Last Fake Movie", "NC-17", "115"); //more than 7 DVDs test
-		addOrModifyDVD("The Shining", "R", "123"); //duplicate test
-		System.out.println("-------");
-		System.out.println(toString());
+		try {
+		  // put file in project main folder, not the src folder
+		  FileReader fin = new FileReader(filename);
+		  BufferedReader bis = new BufferedReader(fin);
+		  
+		  String line;
+		  while ((line = bis.readLine()) != null) {
+			  String[] values = line.split(",");
+			  if(values.length != 3) {
+				  System.out.println("Warning: Ignoring invalid DVD entry in file \"" + line + "\"");
+				  continue;
+			  }
+			  addOrModifyDVD(values[0], values[1], values[2]);
+		  }
+		} 
+		catch (Exception e) {
+			System.err.println("Error reading file: " + e);
+		}
 	}
 	
 	public void save() {
