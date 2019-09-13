@@ -56,6 +56,8 @@ public class DVDCollection {
 		if(runTime <= 0) {
 			return;
 		}
+		
+		modified = true;
 			
 		title = title.toUpperCase(); //force user input to upper case
 		
@@ -88,7 +90,7 @@ public class DVDCollection {
 	public void removeDVD(String title) {
 		int index = findDVD(title);
 		if(index >= 0) {
-
+			modified = true;
 	        DVD[] newArray = new DVD[dvdArray.length - 1]; 
 	        System.arraycopy(dvdArray, 0, newArray, 0, index); 
 	        System.arraycopy(dvdArray, index + 1, 
@@ -136,19 +138,41 @@ public class DVDCollection {
 		  while ((line = bis.readLine()) != null) {
 			  String[] values = line.split(",");
 			  if(values.length != 3) {
-				  System.out.println("Warning: Ignoring invalid DVD entry in file \"" + line + "\"");
-				  continue;
+				  System.out.println("Error: Invalid DVD entry in file \"" + line + "\"");
+				  return;
 			  }
 			  addOrModifyDVD(values[0], values[1], values[2]);
 		  }
+		  modified = false;
+		  sourceName = filename;
 		} 
 		catch (Exception e) {
-			System.err.println("Error reading file: " + e);
+			System.out.println("File not found. Starting new collection.");
 		}
 	}
 	
 	public void save() {
-		//todo
+		try {
+			if(!modified) {
+				System.out.println("Notice: No changes to save. File not modified.");
+				return;
+			}
+			
+			FileWriter fw = new FileWriter(sourceName);
+			if(numdvds > 0) {
+				for(int i = 0; i < numdvds; i++) {
+					fw.write(dvdArray[i].getTitle() + "," + dvdArray[i].getRating() + "," + dvdArray[i].getRunningTime());
+					fw.write(System.lineSeparator());
+				}
+			}
+			
+			fw.close();
+			System.out.println("Notice: Changes to " + sourceName + " saved successfully.");
+			modified = false;
+		} 
+		catch (IOException e) {
+			System.err.println("Error saving file: " + e);
+		}
 	}
 
 	// Additional private helper methods go here:
